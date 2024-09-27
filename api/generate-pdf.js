@@ -1,17 +1,42 @@
-import { PDFDocument, rgb, StandardFonts } from 'pdf-lib';
+// Import necessary libraries
+const { PDFDocument, rgb, StandardFonts } = require('pdf-lib');
 
-// Function to handle the PDF generation
-export default async function handler(req, res) {
-    if (req.method === 'POST') {
-        const { company_name } = req.body;
+// Function to get today's date in a readable format
+const getReadableDate = () => {
+  const today = new Date();
+  const options = { year: 'numeric', month: 'long', day: 'numeric' };
+  return today.toLocaleDateString('en-US', options);
+};
 
-        // Create a new PDF document
-        const pdfDoc = await PDFDocument.create();
-        const page = pdfDoc.addPage([600, 700]);
-        const timesRomanFont = await pdfDoc.embedFont(StandardFonts.TimesRoman);
+// Function to wrap text for PDF
+function wrapText(text, font, fontSize, maxWidth) {
+  const words = text.split(' ');
+  let lines = [];
+  let currentLine = '';
 
-        const currentDate = new Date().toLocaleDateString();
-        const coverLetter = `
+  words.forEach((word) => {
+    const testLine = currentLine ? `${currentLine} ${word}` : word;
+    const textWidth = font.widthOfTextAtSize(testLine, fontSize);
+    if (textWidth < maxWidth) {
+      currentLine = testLine;
+    } else {
+      lines.push(currentLine);
+      currentLine = word;
+    }
+  });
+  lines.push(currentLine);
+  return lines;
+}
+
+// Main handler function for generating PDF
+exports.handler = async (event) => {
+  const { company_name } = JSON.parse(event.body); // Parse the request body
+
+  // Get today's date in a readable format
+  const currentDate = getReadableDate();
+
+  // Hardcoded cover letter template with today's date and dynamic company name
+  const coverLetter = `
 To: Hiring Manager,
 
 Date: ${currentDate}
@@ -25,39 +50,60 @@ I am proud of the fact that in group projects, I'm either the guy with the answe
 Sincerely,
 Taranveer Singh
 (https://taranveer.com)
-        `;
+  `;
 
-        // Write the cover letter to the PDF
-        const fontSize = 12;
-        const lines = coverLetter.trim().split('\n');
-        let yPosition = 650;
+  // Create a new PDF document
+  const pdfDoc = await PDFDocument.create();
+  const page = pdfDoc.addPage([600, 700]); // Adjusted page size for longer content
 
-        // Loop over each line of the cover letter and draw it on the PDF
-        for (const line of lines) {
-            if (line.trim()) {
-                page.drawText(line.trim(), {
-                    x: 50,
-                    y: yPosition,
-                    size: fontSize,
-                    font: timesRomanFont,
-                    color: rgb(0, 0, 0),
-                });
-                yPosition -= 14; // Move down for the next line
-            } else {
-                yPosition -= 20; // Extra space for empty lines
-            }
-        }
+  // Embed font
+  const timesRomanFont = await pdfDoc.embedFont(StandardFonts.TimesRoman);
+  const fontSize = 12;
+  const maxWidth = 550; // Set the maximum width for the text (for word wrapping)
 
-        // Serialize the PDF to bytes
-        const pdfBytes = await pdfDoc.save();
+  // Split the cover letter into lines at each newline (\n)
+  const lines = coverLetter.trim().split('\n');
 
-        // Set the response headers to allow downloading the PDF
-        res.setHeader('Content-Type', 'application/pdf');
-        res.setHeader('Content-Disposition', 'attachment; filename=cover_letter.pdf');
-        res.status(200).send(Buffer.from(pdfBytes));
+  // Initial y-position for the text
+  let yPosition = 650;
+
+  // Loop over each line of the cover letter and draw it on the PDF
+  lines.forEach(line => {
+    if (line.trim() !== '') {
+      // Wrap the text if it's too wide for the page
+      const wrappedLines = wrapText(line.trim(), timesRomanFont, fontSize, maxWidth);
+      
+      wrappedLines.forEach(wrappedLine => {
+        // Check if the line contains the hyperlink
+        const isLink = wrappedLine.includes('https://taranveer.com');
+        
+        // Draw the line with different colors for links
+        page.drawText(wrappedLine, {
+          x: 25, // X position (left margin)
+          y: yPosition, // Y position
+          size: fontSize,
+          font: timesRomanFont,
+          color: isLink ? rgb(0, 0, 1) : rgb(0, 0, 0), // Blue for link, black otherwise
+        });
+        
+        yPosition -= 14; // Move y position down for each wrapped line
+      });
     } else {
-        // Handle method not allowed
-        res.setHeader('Allow', ['POST']);
-        res.status(405).end(`Method ${req.method} Not Allowed`);
+      yPosition -= 20; // Decrease y-position for empty lines (paragraph breaks)
     }
-}
+  });
+
+  // Serialize the PDF to bytes
+  const pdfBytes = await pdfDoc.save();
+
+  // Return the PDF as a response
+  return {
+    statusCode: 200,
+    headers: {
+      'Content-Type': 'application/pdf',
+      'Content-Disposition': 'attachment; filename=cover_letter.pdf',
+    },
+    body: pdfBytes.toString('base64'), // Encode the PDF as base64
+    isBase64Encoded: true // Indicate that the response body is base64-encoded
+  };
+};
