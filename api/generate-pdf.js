@@ -40,7 +40,7 @@ function wrapText(text, font, fontSize, maxWidth) {
   return wrappedLines;
 }
 
-exports.handler = async (event) => {
+const generatePDF = async (event) => {
   try {
     const { company_name } = JSON.parse(event.body);
 
@@ -116,3 +116,6 @@ Taranveer Singh
     };
   }
 };
+
+// Correct export for Vercel Serverless function
+module.exports = generatePDF;
