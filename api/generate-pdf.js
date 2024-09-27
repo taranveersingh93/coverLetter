@@ -7,116 +7,88 @@ const getReadableDate = () => {
   return today.toLocaleDateString('en-US', options);
 };
 
-// Function to wrap text for PDF without splitting words
-function wrapText(text, font, fontSize, maxWidth) {
-  const lines = text.split('\n'); // Split the text into lines by paragraph breaks
-  const wrappedLines = [];
+// Function to handle PDF generation logic
+async function generatePDF(companyName) {
+  // Get today's date
+  const currentDate = getReadableDate();
 
-  lines.forEach(line => {
-    let currentLine = '';
-    const words = line.split(' '); // Split into words for wrapping
-
-    words.forEach(word => {
-      const testLine = currentLine ? `${currentLine} ${word}` : word;
-      const textWidth = font.widthOfTextAtSize(testLine, fontSize);
-
-      // If the line width is within the max width, keep adding
-      if (textWidth < maxWidth) {
-        currentLine = testLine;
-      } else {
-        if (currentLine) {
-          wrappedLines.push(currentLine); // Push the wrapped line
-        }
-        currentLine = word; // Start a new line with the current word
-      }
-    });
-
-    // Push any remaining text in the line
-    if (currentLine) {
-      wrappedLines.push(currentLine);
-    }
-  });
-
-  return wrappedLines;
-}
-
-const generatePDF = async (event) => {
-  try {
-    // No need to parse event.body, as it's already an object in Vercel's serverless functions
-    const { company_name } = event.body;
-
-    if (!company_name) {
-      return {
-        statusCode: 400,
-        body: JSON.stringify({ error: 'Company name is required.' }),
-      };
-    }
-
-    const currentDate = getReadableDate();
-
-    const coverLetter = `
+  // Hardcoded cover letter template
+  const coverLetter = `
 To: Hiring Manager,
 
 Date: ${currentDate}
 
-I am a perpetual student who pursues his craft relentlessly. I earned cloud computing certificates from AWS, attended a frontend program, studied backend, and am now finishing up a CS degree. Throughout my journey, I have always wanted to learn more. With that very same sentiment, I look forward to joining ${company_name} and continuing to learn on the job.
+I am a perpetual student who pursues his craft relentlessly. I earned cloud computing certificates from AWS, attended a frontend program, studied backend, and am now finishing up a CS degree. Throughout my journey, I have always wanted to learn more. With that very same sentiment, I look forward to joining ${companyName} and continuing to learn on the job.
 
 My 97 percentile on the GMAT shows that I have a "verified" quantitative aptitude but I also have customer service experience. As a result, I innately understand the "why" behind any product feature that I'm implementing. Before pushing any code, I imagine receiving a call from a frustrated customer. Yes, my inner voice is an imaginary irate client and that makes for great quality checks.
 
-I am proud of the fact that in group projects, I'm either the guy with the answers, or the one with the right questions. As much as ${company_name} is a dream workplace for me, I'm sure I'd make for a dream employee as well because of my work ethic, teamwork and technical aptitude.
+I am proud of the fact that in group projects, I'm either the guy with the answers, or the one with the right questions. As much as ${companyName} is a dream workplace for me, I'm sure I'd make for a dream employee as well because of my work ethic, teamwork and technical aptitude.
 
 Sincerely,
 Taranveer Singh
 (https://taranveer.com)
-    `;
+  `;
 
-    const pdfDoc = await PDFDocument.create();
-    const page = pdfDoc.addPage([600, 700]); // Page size: width 600, height 700
+  // Create a new PDF document
+  const pdfDoc = await PDFDocument.create();
+  const page = pdfDoc.addPage([600, 700]); // Adjust page size for longer content
 
-    const timesRomanFont = await pdfDoc.embedFont(StandardFonts.TimesRoman);
-    const fontSize = 12;
-    const maxWidth = 550; // Set the maximum width for the text (for word wrapping)
+  // Embed font
+  const timesRomanFont = await pdfDoc.embedFont(StandardFonts.TimesRoman);
+  const fontSize = 12;
+  const maxWidth = 500; // Set the maximum width for the text
 
-    const wrappedLines = wrapText(coverLetter.trim(), timesRomanFont, fontSize, maxWidth);
-    let yPosition = 650; // Starting y-position for the text
+  // Split the cover letter into lines at each newline
+  const lines = coverLetter.trim().split('\n');
 
-    wrappedLines.forEach(line => {
-      if (line.trim() !== '') {
-        const isLink = line.includes('https://taranveer.com');
+  // Initial y-position for the text
+  let yPosition = 650;
 
-        page.drawText(line, {
-          x: 25, // X position (left margin)
-          y: yPosition,
-          size: fontSize,
-          font: timesRomanFont,
-          color: isLink ? rgb(0, 0, 1) : rgb(0, 0, 0), // Blue for link, black otherwise
-        });
+  // Loop over each line of the cover letter and draw it on the PDF
+  for (const line of lines) {
+    if (line.trim() !== '') {
+      // Check if the line contains the hyperlink
+      const isLink = line.includes('https://taranveer.com');
 
-        yPosition -= 14; // Move y position down for each line
-      } else {
-        yPosition -= 20; // Decrease y-position for empty lines (paragraph breaks)
-      }
-    });
+      // Draw the line
+      page.drawText(line.trim(), {
+        x: 50, // X position (left margin)
+        y: yPosition, // Y position
+        size: fontSize,
+        font: timesRomanFont,
+        color: isLink ? rgb(0, 0, 1) : rgb(0, 0, 0), // Blue for link, black otherwise
+      });
 
-    const pdfBytes = await pdfDoc.save();
+      yPosition -= 14; // Move y position down for each line
+    } else {
+      yPosition -= 20; // Decrease y-position for empty lines (paragraph breaks)
+    }
+  }
 
-    return {
-      statusCode: 200,
-      headers: {
-        'Content-Type': 'application/pdf',
-        'Content-Disposition': 'attachment; filename=cover_letter.pdf',
-      },
-      body: pdfBytes.toString('base64'),
-      isBase64Encoded: true,
-    };
+  // Serialize the PDF to bytes
+  const pdfBytes = await pdfDoc.save();
+  return pdfBytes;
+}
+
+module.exports = async (req, res) => {
+  try {
+    const { company_name } = req.body;
+
+    if (!company_name) {
+      return res.status(400).json({ error: 'Company name is required.' });
+    }
+
+    // Generate the PDF asynchronously
+    const pdfBytes = await generatePDF(company_name);
+
+    // Set the response headers to allow downloading the PDF
+    res.setHeader('Content-Type', 'application/pdf');
+    res.setHeader('Content-Disposition', 'attachment; filename=cover_letter.pdf');
+
+    // Send the PDF as the response
+    res.status(200).send(Buffer.from(pdfBytes));
   } catch (error) {
     console.error('Error generating PDF:', error);
-    return {
-      statusCode: 500,
-      body: JSON.stringify({ error: 'Failed to generate PDF.' }),
-    };
+    res.status(500).json({ error: 'Failed to generate PDF.' });
   }
 };
-
-// Correct export for Vercel Serverless function
-module.exports = generatePDF;
