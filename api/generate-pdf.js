@@ -18,11 +18,19 @@ To: Hiring Manager,
 
 Date: ${currentDate}
 
-I am a perpetual student who pursues his craft relentlessly. I earned cloud computing certificates from AWS, attended a frontend program, studied backend, and am now finishing up a CS degree. Throughout my journey, I have always wanted to learn more. With that very same sentiment, I look forward to joining ${companyName} and continuing to learn on the job.
+I am a perpetual student who pursues his craft relentlessly. I earned cloud computing certificates from AWS, 
+attended a frontend program, studied backend, and am now finishing up a CS degree. Throughout my journey, 
+I have always wanted to learn more. With that very same sentiment, I look forward to joining ${companyName}
+and continuing to learn on the job.
 
-My 97 percentile on the GMAT shows that I have a "verified" quantitative aptitude but I also have customer service experience. As a result, I innately understand the "why" behind any product feature that I'm implementing. Before pushing any code, I imagine receiving a call from a frustrated customer. Yes, my inner voice is an imaginary irate client and that makes for great quality checks.
+My 97 percentile on the GMAT shows that I have a "verified" quantitative aptitude but I also have 
+customer service experience. As a result, I innately understand the "why" behind any product feature that
+I'm implementing. Before pushing any code, I imagine receiving a call from a frustrated customer. 
+Yes, my inner voice is an imaginary irate client and that makes for great quality checks.
 
-I am proud of the fact that in group projects, I'm either the guy with the answers, or the one with the right questions. As much as ${companyName} is a dream workplace for me, I'm sure I'd make for a dream employee as well because of my work ethic, teamwork and technical aptitude.
+I am proud of the fact that in group projects, I'm either the guy with the answers, or the one with the
+right questions. As much as ${companyName} is a dream workplace for me, I'm sure I'd make for a dream employee
+as well because of my work ethic, teamwork and technical aptitude.
 
 Sincerely,
 Taranveer Singh
