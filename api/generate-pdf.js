@@ -42,7 +42,8 @@ function wrapText(text, font, fontSize, maxWidth) {
 
 const generatePDF = async (event) => {
   try {
-    const { company_name } = JSON.parse(event.body);
+    // No need to parse event.body, as it's already an object in Vercel's serverless functions
+    const { company_name } = event.body;
 
     if (!company_name) {
       return {
