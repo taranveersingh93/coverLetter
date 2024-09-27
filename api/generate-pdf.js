@@ -1,4 +1,3 @@
-// Import necessary libraries
 const { PDFDocument, rgb, StandardFonts } = require('pdf-lib');
 
 // Function to get today's date in a readable format
@@ -8,35 +7,53 @@ const getReadableDate = () => {
   return today.toLocaleDateString('en-US', options);
 };
 
-// Function to wrap text for PDF
+// Function to wrap text for PDF without splitting words
 function wrapText(text, font, fontSize, maxWidth) {
-  const words = text.split(' ');
-  let lines = [];
-  let currentLine = '';
+  const lines = text.split('\n'); // Split the text into lines by paragraph breaks
+  const wrappedLines = [];
 
-  words.forEach((word) => {
-    const testLine = currentLine ? `${currentLine} ${word}` : word;
-    const textWidth = font.widthOfTextAtSize(testLine, fontSize);
-    if (textWidth < maxWidth) {
-      currentLine = testLine;
-    } else {
-      lines.push(currentLine);
-      currentLine = word;
+  lines.forEach(line => {
+    let currentLine = '';
+    const words = line.split(' '); // Split into words for wrapping
+
+    words.forEach(word => {
+      const testLine = currentLine ? `${currentLine} ${word}` : word;
+      const textWidth = font.widthOfTextAtSize(testLine, fontSize);
+
+      // If the line width is within the max width, keep adding
+      if (textWidth < maxWidth) {
+        currentLine = testLine;
+      } else {
+        if (currentLine) {
+          wrappedLines.push(currentLine); // Push the wrapped line
+        }
+        currentLine = word; // Start a new line with the current word
+      }
+    });
+
+    // Push any remaining text in the line
+    if (currentLine) {
+      wrappedLines.push(currentLine);
     }
   });
-  lines.push(currentLine);
-  return lines;
+
+  return wrappedLines;
 }
 
-// Main handler function for generating PDF
 exports.handler = async (event) => {
-  const { company_name } = JSON.parse(event.body); // Parse the request body
+  try {
+    const { company_name } = JSON.parse(event.body);
 
-  // Get today's date in a readable format
-  const currentDate = getReadableDate();
+    if (!company_name) {
+      return {
+        statusCode: 400,
+        body: JSON.stringify({ error: 'Company name is required.' }),
+      };
+    }
 
-  // Hardcoded cover letter template with today's date and dynamic company name
-  const coverLetter = `
+    const currentDate = getReadableDate();
+
+    const coverLetter = `
 To: Hiring Manager,
 
 Date: ${currentDate}
@@ -50,60 +67,52 @@ I am proud of the fact that in group projects, I'm either the guy with the answe
 Sincerely,
 Taranveer Singh
 (https://taranveer.com)
-  `;
+    `;
 
-  // Create a new PDF document
-  const pdfDoc = await PDFDocument.create();
-  const page = pdfDoc.addPage([600, 700]); // Adjusted page size for longer content
+    const pdfDoc = await PDFDocument.create();
+    const page = pdfDoc.addPage([600, 700]); // Page size: width 600, height 700
 
-  // Embed font
-  const timesRomanFont = await pdfDoc.embedFont(StandardFonts.TimesRoman);
-  const fontSize = 12;
-  const maxWidth = 550; // Set the maximum width for the text (for word wrapping)
+    const timesRomanFont = await pdfDoc.embedFont(StandardFonts.TimesRoman);
+    const fontSize = 12;
+    const maxWidth = 550; // Set the maximum width for the text (for word wrapping)
 
-  // Split the cover letter into lines at each newline (\n)
-  const lines = coverLetter.trim().split('\n');
+    const wrappedLines = wrapText(coverLetter.trim(), timesRomanFont, fontSize, maxWidth);
+    let yPosition = 650; // Starting y-position for the text
 
-  // Initial y-position for the text
-  let yPosition = 650;
+    wrappedLines.forEach(line => {
+      if (line.trim() !== '') {
+        const isLink = line.includes('https://taranveer.com');
 
-  // Loop over each line of the cover letter and draw it on the PDF
-  lines.forEach(line => {
-    if (line.trim() !== '') {
-      // Wrap the text if it's too wide for the page
-      const wrappedLines = wrapText(line.trim(), timesRomanFont, fontSize, maxWidth);
-      
-      wrappedLines.forEach(wrappedLine => {
-        // Check if the line contains the hyperlink
-        const isLink = wrappedLine.includes('https://taranveer.com');
-        
-        // Draw the line with different colors for links
-        page.drawText(wrappedLine, {
+        page.drawText(line, {
           x: 25, // X position (left margin)
-          y: yPosition, // Y position
+          y: yPosition,
           size: fontSize,
           font: timesRomanFont,
           color: isLink ? rgb(0, 0, 1) : rgb(0, 0, 0), // Blue for link, black otherwise
         });
-        
-        yPosition -= 14; // Move y position down for each wrapped line
-      });
-    } else {
-      yPosition -= 20; // Decrease y-position for empty lines (paragraph breaks)
-    }
-  });
 
-  // Serialize the PDF to bytes
-  const pdfBytes = await pdfDoc.save();
+        yPosition -= 14; // Move y position down for each line
+      } else {
+        yPosition -= 20; // Decrease y-position for empty lines (paragraph breaks)
+      }
+    });
 
-  // Return the PDF as a response
-  return {
-    statusCode: 200,
-    headers: {
-      'Content-Type': 'application/pdf',
-      'Content-Disposition': 'attachment; filename=cover_letter.pdf',
-    },
-    body: pdfBytes.toString('base64'), // Encode the PDF as base64
-    isBase64Encoded: true // Indicate that the response body is base64-encoded
-  };
+    const pdfBytes = await pdfDoc.save();
+
+    return {
+      statusCode: 200,
+      headers: {
+        'Content-Type': 'application/pdf',
+        'Content-Disposition': 'attachment; filename=cover_letter.pdf',
+      },
+      body: pdfBytes.toString('base64'),
+      isBase64Encoded: true,
+    };
+  } catch (error) {
+    console.error('Error generating PDF:', error);
+    return {
+      statusCode: 500,
+      body: JSON.stringify({ error: 'Failed to generate PDF.' }),
+    };
+  }
 };
