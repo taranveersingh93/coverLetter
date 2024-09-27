@@ -37,7 +37,7 @@ function wrapText(text, font, fontSize, maxWidth) {
 
 // HTML Form Route
 app.get('/', (req, res) => {
-  res.sendFile(path.join(__dirname, 'public', 'index.html'));
+  res.sendFile(path.join(__dirname, 'index.html'));
 });
 
 // Handle form submission and generate PDF
