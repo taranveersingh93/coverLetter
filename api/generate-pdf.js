@@ -3,8 +3,15 @@ const { PDFDocument, rgb, StandardFonts } = require('pdf-lib');
 // Function to get today's date in a readable format
 const getReadableDate = () => {
   const today = new Date();
-  const options = { year: 'numeric', month: 'long', day: 'numeric' };
-  return today.toLocaleDateString('en-US', options);
+
+  const options = {
+    year: 'numeric',
+    month: 'long',
+    day: 'numeric',
+    timeZone: 'America/New_York'
+  };
+
+  return new Intl.DateTimeFormat('en-US', options).format(today);
 };
 
 // Function to handle PDF generation logic
