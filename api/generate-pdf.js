@@ -88,10 +88,10 @@ module.exports = async (req, res) => {
 
     // Generate the PDF asynchronously
     const pdfBytes = await generatePDF(company_name);
-
+    const file = company_name.toLowerCase();
     // Set the response headers to allow downloading the PDF
     res.setHeader('Content-Type', 'application/pdf');
-    res.setHeader('Content-Disposition', 'attachment; filename=cover_letter.pdf');
+    res.setHeader('Content-Disposition', `attachment; filename=taranveer_singh_${file}_cover_letter.pdf`);
 
     // Send the PDF as the response
     res.status(200).send(Buffer.from(pdfBytes));
