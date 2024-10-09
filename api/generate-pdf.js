@@ -25,9 +25,9 @@ To: Hiring Manager,
 
 Date: ${currentDate}
 
-I am writing to express my interest in joining ${companyName}, where I believe my passion for continuous learning
-and technical expertise would be a perfect fit. As someone who is deeply committed to advancing my skills,
-I have earned cloud computing certifications from AWS, completed a frontend development program, 
+I am writing to express my interest in joining ${companyName}, where I believe my passion for continuous 
+learning and technical expertise would be a perfect fit. As someone who is deeply committed to advancing
+my skills, I have earned cloud computing certifications from AWS, completed a frontend development program, 
 explored backend technologies, and have recently earned my Computer Science degree. 
   
 This ongoing journey of learning has always been driven by my desire to push boundaries, and I am eager to
@@ -42,12 +42,13 @@ from a frustrated customer. This mindset has been instrumental in driving high-q
 
 In group projects, I am proud to be the team member who either has the answers or asks the right questions. 
 My ability to collaborate and think critically has allowed me to contribute meaningfully to the success of 
-every team I've been a part of. ${companyName} represents an ideal environment for me to continue learning, growing,
+every team I've been a part of. ${companyName} represents an ideal environment for me to continue learning,
+ growing,
 and contributing, and I am confident that my work ethic, teamwork, and technical skill set would make me a 
 valuable asset to your team.
 
-Thank you for considering my application. I look forward to the opportunity to contribute to ${companyName}’s success
-and am excited about the possibility of learning and growing with your team.
+Thank you for considering my application. I look forward to the opportunity to contribute to ${companyName}’s
+success and am excited about the possibility of learning and growing with your team.
 
 Sincerely,
 Taranveer Singh
