@@ -25,19 +25,29 @@ To: Hiring Manager,
 
 Date: ${currentDate}
 
-I am a perpetual student who pursues his craft relentlessly. I earned cloud computing certificates from AWS, 
-attended a frontend program, studied backend, and am now finishing up a CS degree. Throughout my journey, 
-I have always wanted to learn more. With that very same sentiment, I look forward to joining ${companyName}
-and continuing to learn on the job.
+I am writing to express my interest in joining ${companyName}, where I believe my passion for continuous learning
+and technical expertise would be a perfect fit. As someone who is deeply committed to advancing my skills,
+I have earned cloud computing certifications from AWS, completed a frontend development program, 
+explored backend technologies, and have recently earned my Computer Science degree. 
+  
+This ongoing journey of learning has always been driven by my desire to push boundaries, and I am eager to
+bring that same energy to ${companyName}.
 
-My 97 percentile on the GMAT shows that I have a "verified" quantitative aptitude but I also have 
-customer service experience. As a result, I innately understand the "why" behind any product feature that
-I'm implementing. Before pushing any code, I imagine receiving a call from a frustrated customer. 
-Yes, my inner voice is an imaginary irate client and that makes for great quality checks.
+My ability to think analytically has been "verified" through my 97th percentile GMAT score,
+demonstrating my quantitative aptitude. However, what truly sets me apart is my blend of technical skills
+with hands-on customer service experience. This duality allows me to approach each project with a deep
+understanding of not just the "how" but the "why" behind the product features I develop. 
+Before any code is written or deployed, I visualize how it will impact the end user—often imagining feedback
+from a frustrated customer. This mindset has been instrumental in driving high-quality, user-centric solutions.
 
-I am proud of the fact that in group projects, I'm either the guy with the answers, or the one with the
-right questions. As much as ${companyName} is a dream workplace for me, I'm sure I'd make for a dream employee
-as well because of my work ethic, teamwork and technical aptitude.
+In group projects, I am proud to be the team member who either has the answers or asks the right questions. 
+My ability to collaborate and think critically has allowed me to contribute meaningfully to the success of 
+every team I've been a part of. ${companyName} represents an ideal environment for me to continue learning, growing,
+and contributing, and I am confident that my work ethic, teamwork, and technical skill set would make me a 
+valuable asset to your team.
+
+Thank you for considering my application. I look forward to the opportunity to contribute to ${companyName}’s success
+and am excited about the possibility of learning and growing with your team.
 
 Sincerely,
 Taranveer Singh
