@@ -29,6 +29,23 @@
 			button:hover {
 				background-color: #45a049;
 			}
+			#generatedText {
+				display: none;
+				margin-top: 20px;
+				padding: 15px;
+				background-color: #f9f9f9;
+				border: 1px solid #ddd;
+			}
+			#backButton {
+				display: none;
+				margin-top: 20px;
+				padding: 10px 20px;
+				font-size: 16px;
+				background-color: #007bff;
+				color: white;
+				border: none;
+				cursor: pointer;
+			}
 		</style>
 	</head>
 	<body>
@@ -38,5 +55,7 @@
 			<input type="text" id="company_name" name="company_name" required /><br />
 			<button type="submit">Generate PDF</button>
 		</form>
+		<!-- Section to display the generated cover letter -->
+		<div id="generatedText"></div>
 	</body>
 </html>
