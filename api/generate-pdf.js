@@ -27,9 +27,9 @@ Date: ${currentDate}
 
 I am writing to express my interest in joining ${companyName}, where I believe my passion for continuous
 learning and technical expertise would be a perfect fit. I have earned cloud computing certifications from
-AWS, completed a frontend development program, explored backend technologies, and recently graduated with
-a degree in Computer Science. This drive for continuous growth fuels my desire to contribute meaningfully
-to ${companyName}.
+AWS, completed a frontend development program, explored backend technologies, and recently graduated 
+with a degree in Computer Science. This drive for continuous growth fuels my desire to contribute 
+meaningfully to ${companyName}.
 
 What sets me apart is my blend of technical skills and hands-on customer service experience.
 In a previous role, I was the go-to person for de-escalations, once staying two hours past closing to help
